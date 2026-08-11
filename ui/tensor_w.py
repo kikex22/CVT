@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog,messagebox
+from tkinter import filedialog, messagebox, ttk
 import os
 from core.paths import default_cv_dir, existing_parent_or_default
 from core.tensor import Trt
@@ -132,10 +132,91 @@ class Tensor:
             messagebox.showerror("Error", "Workspace debe ser numérico (MiB)")
             return
 
-        Trt(
+        run = Trt(
             onnx_path=onnx,
             engine_path=engine,
             precision=precision,
             workspace=int(workspace),
-            verbose=True
+            verbose=True,
+            show_background_message=False,
         )
+
+        if run and run.log_path and not run.opened_terminal:
+            self.show_tensorrt_monitor(run, engine)
+
+    def show_tensorrt_monitor(self, run, engine_path):
+        monitor = tk.Toplevel(self.root)
+        monitor.title("TensorRT")
+        monitor.geometry("760x440")
+
+        status_var = tk.StringVar(value="Compilando TensorRT...")
+        tk.Label(
+            monitor,
+            textvariable=status_var,
+            font=("Arial", 13, "bold"),
+            pady=10
+        ).pack()
+
+        progress = ttk.Progressbar(monitor, mode="indeterminate")
+        progress.pack(fill=tk.X, padx=16, pady=(0, 10))
+        progress.start(10)
+
+        tk.Label(monitor, text=f"Log: {run.log_path}").pack(anchor="w", padx=16)
+
+        log_text = tk.Text(monitor, height=16, width=90)
+        log_text.pack(fill=tk.BOTH, expand=True, padx=16, pady=10)
+
+        scrollbar = tk.Scrollbar(log_text)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        log_text.config(yscrollcommand=scrollbar.set)
+        scrollbar.config(command=log_text.yview)
+
+        close_button = tk.Button(
+            monitor,
+            text="Cerrar",
+            command=monitor.destroy,
+            state=tk.DISABLED,
+        )
+        close_button.pack(pady=(0, 12))
+
+        last_pos = [0]
+
+        def append_log():
+            try:
+                with open(run.log_path, "r", encoding="utf-8", errors="replace") as log_file:
+                    log_file.seek(last_pos[0])
+                    chunk = log_file.read()
+                    last_pos[0] = log_file.tell()
+            except OSError:
+                chunk = ""
+
+            if chunk:
+                log_text.insert(tk.END, chunk)
+                log_text.see(tk.END)
+
+        def poll():
+            if not monitor.winfo_exists():
+                return
+
+            append_log()
+            exit_code = run.process.poll()
+
+            if exit_code is None:
+                monitor.after(1000, poll)
+                return
+
+            progress.stop()
+            close_button.config(state=tk.NORMAL)
+
+            if exit_code == 0 and os.path.exists(engine_path):
+                status_var.set("TensorRT ENGINE generado")
+                messagebox.showinfo("TensorRT", f"ENGINE generado:\n{engine_path}")
+            else:
+                status_var.set(f"TensorRT termino con error ({exit_code})")
+                messagebox.showerror(
+                    "TensorRT",
+                    "La conversion termino con error.\n\n"
+                    f"Log:\n{run.log_path}"
+                )
+
+        poll()

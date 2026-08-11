@@ -10,7 +10,8 @@ def Trt(
     engine_path,
     precision="fp16",   # fp32 | fp16 | int8
     workspace=4096,
-    verbose=True
+    verbose=True,
+    show_background_message=True,
 ):
     trtexec = trtexec_bin()
 
@@ -56,8 +57,9 @@ def Trt(
 
     print("Ejecutando:", cmd)
 
-    run_command(
+    return run_command(
         command=cmd,
         title="tensorrt_conversion",
         done_message="TensorRT ENGINE generado",
+        show_background_message=show_background_message,
     )

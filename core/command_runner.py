@@ -2,9 +2,17 @@ import os
 import shlex
 import shutil
 import subprocess
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from tkinter import TclError, messagebox
+
+
+@dataclass
+class CommandRun:
+    process: subprocess.Popen
+    log_path: str | None = None
+    opened_terminal: bool = False
 
 
 def _log_path(title):
@@ -52,11 +60,11 @@ def _terminal_args(command, done_message):
     return None
 
 
-def run_command(command, title, done_message):
+def run_command(command, title, done_message, show_background_message=True):
     terminal_args = _terminal_args(command, done_message)
     if terminal_args:
-        subprocess.Popen(terminal_args)
-        return None
+        process = subprocess.Popen(terminal_args)
+        return CommandRun(process=process, opened_terminal=True)
 
     log_path = _log_path(title)
     quoted_log = shlex.quote(str(log_path))
@@ -73,16 +81,22 @@ def run_command(command, title, done_message):
         f"}} > {quoted_log} 2>&1"
     )
 
-    subprocess.Popen(
+    process = subprocess.Popen(
         ["bash", "-lc", logged_command],
         cwd=os.getcwd(),
         start_new_session=True,
     )
 
-    _show_info(
-        "Ejecutando",
-        "No encontre una terminal grafica en este sistema.\n"
-        "El comando se esta ejecutando en segundo plano.\n\n"
-        f"Log:\n{log_path}"
+    if show_background_message:
+        _show_info(
+            "Ejecutando",
+            "No encontre una terminal grafica en este sistema.\n"
+            "El comando se esta ejecutando en segundo plano.\n\n"
+            f"Log:\n{log_path}"
+        )
+
+    return CommandRun(
+        process=process,
+        log_path=str(log_path),
+        opened_terminal=False,
     )
-    return str(log_path)
