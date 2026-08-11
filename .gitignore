@@ -1,0 +1,35 @@
+__pycache__/
+*.py[cod]
+.agents/
+.codex/
+.vscode/
+
+config/local.json
+
+# Generated Darknet / TensorRT / model artifacts
+*.weights
+*.conv
+*.engine
+*.onnx
+*.plan
+predictions.jpg
+bad.list
+batch_darknet.sh
+output/
+
+# Local vendor/download artifacts
+ngc-cli/
+ngccli_cat_linux.zip
+ngc-cli.md5
+test
+
+# Local analysis/build outputs
+analysis/
+build/
+dist/
+tools/karto_inspect
+
+# Screenshots/training charts generated locally
+*.png
+*.jpg
+*.jpeg

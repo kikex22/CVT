@@ -1,0 +1,7 @@
+{
+  "computer_vision_dir": "~/Computer_Vision",
+  "darknet_train_bin": "~/Documents/darknet/darknet",
+  "darknet_infer_bin": "/usr/bin/darknet",
+  "yolov4_project_dir": "~/Documents/pytorch-YOLOv4",
+  "trtexec_bin": "/usr/bin/trtexec"
+}
