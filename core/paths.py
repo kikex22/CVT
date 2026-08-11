@@ -29,6 +29,15 @@ def current_device():
     hostname = socket.gethostname().strip().lower()
     if "laptop" in hostname or "notebook" in hostname:
         return "laptop"
+
+    try:
+        proc_version = Path("/proc/version").read_text(encoding="utf-8").lower()
+    except OSError:
+        proc_version = ""
+
+    if "microsoft" in proc_version or "wsl" in proc_version:
+        return "laptop"
+
     return "pc"
 
 
@@ -38,6 +47,7 @@ def _profiles():
         "darknet_infer_bin": [
             Path("/usr/bin/darknet"),
             home / "Documents" / "darknet" / "darknet",
+            home / "documents" / "darknet" / "darknet",
             shutil.which("darknet"),
         ],
         "trtexec_bin": [
@@ -52,15 +62,18 @@ def _profiles():
         "pc": {
             "computer_vision_dir": [
                 home / "Computer_Vision",
+                home / "documents",
                 home / "Documents" / "Computer_Vision",
             ],
             "darknet_train_bin": [
                 home / "Documents" / "darknet" / "darknet",
+                home / "documents" / "darknet" / "darknet",
                 Path("/usr/bin/darknet"),
                 shutil.which("darknet"),
             ],
             "yolov4_project_dir": [
                 home / "Documents" / "pytorch-YOLOv4",
+                home / "documents" / "pytorch-YOLOv4",
                 home / "pytorch-YOLOv4",
                 home / "Computer_Vision" / "pytorch-YOLOv4",
             ],
@@ -69,14 +82,17 @@ def _profiles():
         "laptop": {
             "computer_vision_dir": [
                 home / "Computer_Vision",
+                home / "documents",
                 home / "Documents" / "Computer_Vision",
             ],
             "darknet_train_bin": [
+                home / "documents" / "darknet" / "darknet",
                 home / "Documents" / "darknet" / "darknet",
                 Path("/usr/bin/darknet"),
                 shutil.which("darknet"),
             ],
             "yolov4_project_dir": [
+                home / "documents" / "pytorch-YOLOv4",
                 home / "Documents" / "pytorch-YOLOv4",
                 home / "pytorch-YOLOv4",
                 home / "Computer_Vision" / "pytorch-YOLOv4",
