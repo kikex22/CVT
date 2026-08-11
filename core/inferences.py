@@ -1,7 +1,7 @@
-import subprocess
 import os
 from tkinter import messagebox
 
+from core.command_runner import run_command
 from core.paths import darknet_infer_bin
 
 
@@ -49,14 +49,9 @@ def infer_single_image(data, cfg, weights, image):
 
     print("CMD:", cmd)
 
-    # Ejecutar en GNOME Terminal y abrir predictions.jpg
-    subprocess.Popen([
-        "gnome-terminal",
-        "--",
-        "bash",
-        "-c",
-        f"{cmd}; "
-        "echo ''; echo 'Inferencia lista'; "
-        "xdg-open predictions.jpg; "
-        "exec bash"
-    ])
+    # Ejecutar inferencia y abrir predictions.jpg si el sistema lo permite.
+    run_command(
+        command=f"{cmd}; xdg-open predictions.jpg",
+        title="single_image_inference",
+        done_message="Inferencia lista",
+    )

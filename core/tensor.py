@@ -1,7 +1,7 @@
-import subprocess
 import os
 from tkinter import messagebox
 
+from core.command_runner import run_command
 from core.paths import trtexec_bin
 
 
@@ -56,10 +56,8 @@ def Trt(
 
     print("Ejecutando:", cmd)
 
-    subprocess.Popen([
-        "gnome-terminal",
-        "--",
-        "bash",
-        "-c",
-        f'{cmd}; echo ""; echo "TensorRT ENGINE generado"; exec bash'
-    ])
+    run_command(
+        command=cmd,
+        title="tensorrt_conversion",
+        done_message="TensorRT ENGINE generado",
+    )

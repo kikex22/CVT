@@ -1,9 +1,7 @@
-import subprocess
 import os
-import shutil
-import time
 from tkinter import messagebox
 
+from core.command_runner import run_command
 from core.paths import darknet_infer_bin
 
 
@@ -74,7 +72,7 @@ def infer_folder(data, cfg, weights, folder_path, delay=1):
             # Guardar predicción
             f.write(f'cp predictions.jpg "{pred_out}"\n\n')
 
-        f.write('echo "✔ Procesamiento completado."\n\n')
+        f.write('echo "Procesamiento completado."\n\n')
 
         # ==============================
         # 2️⃣ Mostrar slideshow con feh
@@ -82,8 +80,7 @@ def infer_folder(data, cfg, weights, folder_path, delay=1):
         f.write('echo "Mostrando imágenes detectadas (slideshow)..." \n')
         f.write(f'feh -F -D {delay} "{output_dir}"\n\n')
 
-        f.write('echo "✔ Secuencia finalizada."\n')
-        f.write('exec bash\n')
+        f.write('echo "Secuencia finalizada."\n')
 
     # Hacer script ejecutable
     os.chmod(bash_script, 0o755)
@@ -91,12 +88,10 @@ def infer_folder(data, cfg, weights, folder_path, delay=1):
     # ==============================
     # 3️⃣ Ejecutar todo en una sola terminal GNOME
     # ==============================
-    subprocess.Popen([
-        "gnome-terminal",
-        "--",
-        "bash",
-        "-c",
-        f'"{bash_script}"'
-    ])
+    run_command(
+        command=f'"{bash_script}"',
+        title="folder_inference",
+        done_message="Batch Darknet finalizado",
+    )
 
     return output_dir

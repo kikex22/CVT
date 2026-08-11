@@ -1,7 +1,7 @@
-import subprocess
 import os
 from tkinter import messagebox
 
+from core.command_runner import run_command
 from core.paths import darknet_train_bin
 
 def train_darknet(data, cfg, weights=None, use_map=True):
@@ -33,12 +33,10 @@ def train_darknet(data, cfg, weights=None, use_map=True):
 
     print("Ejecutando:", cmd)
 
-    messagebox.showinfo("Entrenando", "Ejecutando entrenamiento en GNOME Terminal...")
+    messagebox.showinfo("Entrenando", "Ejecutando entrenamiento...")
 
-    subprocess.Popen([
-        "gnome-terminal",
-        "--",
-        "bash",
-        "-c",
-        f"{cmd}; echo ''; echo 'Entrenamiento finalizado'; exec bash"
-    ])
+    run_command(
+        command=cmd,
+        title="darknet_train",
+        done_message="Entrenamiento finalizado",
+    )

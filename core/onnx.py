@@ -1,7 +1,7 @@
-import subprocess
 import os
 from tkinter import messagebox
 
+from core.command_runner import run_command
 from core.paths import export_onnx_script, yolov4_venv_activate
 
 
@@ -57,11 +57,8 @@ def convert_to_onnx(cfg, weights, output, input_size):
 
     print("Ejecutando con venv:", cmd)
 
-    # Ejecutar en GNOME Terminal
-    subprocess.Popen([
-        "gnome-terminal",
-        "--",
-        "bash",
-        "-c",
-        f'{cmd}; echo ""; echo "Conversión ONNX finalizada"; exec bash'
-    ])
+    run_command(
+        command=cmd,
+        title="onnx_conversion",
+        done_message="Conversion ONNX finalizada",
+    )

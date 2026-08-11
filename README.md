@@ -42,3 +42,9 @@ CVT_TRTEXEC_BIN=/ruta/trtexec python3 main.py
 ```bash
 python3 main.py
 ```
+
+En WSL puede que no exista una terminal grafica como `gnome-terminal`. En ese caso CVT ejecuta los comandos en segundo plano y guarda la salida en:
+
+```bash
+~/.cache/cvt/logs/
+```
